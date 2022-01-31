@@ -70,7 +70,14 @@ class excel_file():
 		""" Ajout d'une ou plusieurs lignes directement à la suite
 			Data doit obligatoirement être un tuple ou une liste même s'il n'y a qu'un seul élément
 		"""
-		self.ws.append(data)
+		if type(data) not in (list, tuple):
+			raise TypeError("Les données doivent être une liste ou un tuple à une ou deux dimentions")
+		if type(data[0]) in (list, tuple):
+			# Si data a deux dimentions, on boucle car la mathode append ne les gère pas
+			for item in data:
+				self.ws.append(item)
+		else:
+			self.ws.append(data)
 
 
 		
