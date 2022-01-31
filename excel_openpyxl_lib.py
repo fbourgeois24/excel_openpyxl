@@ -1,4 +1,6 @@
 from openpyxl import load_workbook, Workbook
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import PatternFill
 
 class excel_file():
 
@@ -80,18 +82,29 @@ class excel_file():
 			self.ws.append(data)
 
 
-		
+
+	def auto_size(self, column_start=1, column_end=100, row_start=1, row_end=100):
+		""" Redimentionnement des colonnes à la taille du contenu
+			Par défaut pour les 100 premières colonnes et 100 premières lignes
+		"""
+		for column in range(column_start, column_end + 1):
+			max_width = 10
+			for row in range(row_start, row_end + 1):
+				width = len(str(self.ws.cell(row, column).value)) * 1.1
+				if width > max_width:
+					max_width = width
+			self.ws.column_dimensions[get_column_letter(column)].width = max_width
 
 
+		# for column_cells in self.ws.columns:
+		#     length = max(len(str(cell.value)) for cell in column_cells)
+		#     self.ws.column_dimensions[column_cells[0].column_letter].width = length
 
-
-		
-
-	def auto_size(self):
-		""" Redimentionnement des colonnes à la taille du contenu """
-		for column_cells in self.ws.columns:
-		    length = max(len(str(cell.value)) for cell in column_cells)
-		    self.ws.column_dimensions[column_cells[0].column_letter].width = length
+	def color_row(self, row_number, color, fill_type = "solid"):
+		""" Colorer une ligne """
+		for rows in self.ws.iter_cols(min_row=row_number, max_row=row_number, min_col=None, max_col=None):
+			for cell in rows:
+				cell.fill = PatternFill(start_color=color, end_color=color, fill_type = fill_type)
 
 
 	def close(self):
