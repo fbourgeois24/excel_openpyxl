@@ -96,10 +96,6 @@ class excel_file():
 			self.ws.column_dimensions[get_column_letter(column)].width = max_width
 
 
-		# for column_cells in self.ws.columns:
-		#     length = max(len(str(cell.value)) for cell in column_cells)
-		#     self.ws.column_dimensions[column_cells[0].column_letter].width = length
-
 	def color_row(self, row_number, color, fill_type = "solid"):
 		""" Colorer une ligne """
 		for rows in self.ws.iter_cols(min_row=row_number, max_row=row_number, min_col=None, max_col=None):
