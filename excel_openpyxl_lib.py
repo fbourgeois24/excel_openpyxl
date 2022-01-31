@@ -67,7 +67,9 @@ class excel_file():
 
 
 	def append(self, data):
-		""" Ajout d'une ou plusieurs lignes directement à la suite """
+		""" Ajout d'une ou plusieurs lignes directement à la suite
+			Data doit obligatoirement être un tuple ou une liste même s'il n'y a qu'un seul élément
+		"""
 		self.ws.append(data)
 
 
