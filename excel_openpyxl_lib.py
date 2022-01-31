@@ -83,7 +83,7 @@ class excel_file():
 
 
 
-	def auto_size(self, column_start=1, column_end=100, row_start=1, row_end=100):
+	def auto_fit(self, column_start=1, column_end=100, row_start=1, row_end=100):
 		""" Redimentionnement des colonnes à la taille du contenu
 			Par défaut pour les 100 premières colonnes et 100 premières lignes
 		"""
