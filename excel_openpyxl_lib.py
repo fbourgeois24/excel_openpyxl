@@ -2,6 +2,7 @@
 # - https://openpyxl.readthedocs.io/en/stable/tutorial.html
 
 from openpyxl import load_workbook, Workbook
+from openpyxl import styles as excel_style
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
 
