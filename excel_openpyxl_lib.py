@@ -29,8 +29,8 @@ class excel_file():
 		""" Créer une feuille """
 		self.ws[sheet_name] = self.wb.create_sheet(sheet_name)
 
-	def open(self):
-		self.wb = load_workbook(self.filepath)
+	def open(self, data_only=False):
+		self.wb = load_workbook(self.filepath, data_only=data_only)
 		self.ws = {}
 		for sheet in self.wb.sheetnames:
 			self.ws[sheet] = self.wb[sheet]
