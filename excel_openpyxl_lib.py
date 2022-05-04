@@ -35,6 +35,27 @@ class excel_file():
 		for sheet in self.wb.sheetnames:
 			self.ws[sheet] = self.wb[sheet]
 
+	def close(self, save=True):
+		if save:
+			self.wb.save(self.filepath)
+		self.wb.close()
+
+	def read(self, range, sheet=0):
+		""" Lire une valeur dans le classeur """
+		cell_range = self.ws[self.find_sheet(sheet)][range]
+		if not ":" in range:
+			# Si une seule cellule on renvoie la valeur
+			return cell_range.value
+		else:
+			# Si plusiers cellules
+			cell_values = []
+			for line in cell_range:
+				line_values = []
+				for cell in line:
+					line_values.append(cell.value)
+				cell_values.append(line_values)
+			return cell_values
+
 	def write(self, data, sheet=0, from_cell=1, from_line=None):
 		""" Ecriture dans le fichier, 
 			Données à écrire:
@@ -109,6 +130,8 @@ class excel_file():
 		if type(sheet) == int:
 			sheet = tuple(self.ws)[0]
 
+		
+
 		for column in range(column_start, column_end + 1):
 			max_width = 10
 			for row in range(row_start, row_end + 1):
@@ -130,7 +153,18 @@ class excel_file():
 				cell.fill = PatternFill(start_color=color, end_color=color, fill_type = fill_type)
 
 
-	def close(self, save=True):
-		if save:
-			self.wb.save(self.filepath)
-		self.wb.close()
+	def find_sheet(self, sheet):
+		""" Trouver une feuille si recherche par le nom ou l'indice 
+			Renvoie le nom de la feuille
+		"""
+
+		# Si on accède à la feuille par son indice, on récupère son nom
+		if type(sheet) == int:
+			sheet_name = tuple(self.ws)[0]
+		elif type(sheet) == str:
+			sheet_name = sheet
+		else:
+			raise ValueError("sheet doit être une string ou un entier")
+
+		return sheet_name
+
