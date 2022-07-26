@@ -5,6 +5,8 @@ from openpyxl import load_workbook, Workbook
 from openpyxl import styles as excel_style
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
+from openpyxl.styles.colors import Color
+# import logging as log
 
 class excel_file():
 
@@ -18,12 +20,12 @@ class excel_file():
 
 
 	def create_workbook(self, sheet_name=None):
-		wb = Workbook()
+		self.wb = Workbook()
 		# S'il faut donner un nom à la feuille
 		if sheet_name is not None:
-			ws = wb.active
-			ws.title = sheet_name
-		wb.save(self.filepath)
+			self.ws = self.wb.active
+			self.ws.title = sheet_name
+		self.wb.save(self.filepath)
 
 	def create_sheet(self, sheet_name):
 		""" Créer une feuille """
@@ -68,8 +70,7 @@ class excel_file():
 				- si line est à next_free, on cherche la ligne libre suivante après self.next_line
 		"""
 		# Si on accède à la feuille par son indice, on récupère son nom
-		if type(sheet) == int:
-			sheet = tuple(self.ws)[0]
+		sheet = self.find_sheet(sheet)
 
 		# On défini la ligne à écrire
 		if from_line is None:	
@@ -80,7 +81,7 @@ class excel_file():
 		elif from_line == 'next_free':
 			while self.ws[sheet].cell(self.next_line, 1).value is not None:
 				from_line += 1
-		elif from_line.isdigit():
+		elif str(from_line).isdigit():
 			pass
 		else:
 			raise TypeError("Valeur de ligne à écrire incorrecte")
@@ -90,17 +91,20 @@ class excel_file():
 		if type(data) not in (tuple, list):
 			# Cellule unique
 			data_size = [1,1]
+			self.ws[sheet].cell(from_line, from_cell).value = data
 		elif type(data[0]) not in (tuple, list):
 			# On défini si c'est une liste à deux dimentions en regardant le premier élément de la liste
 			# Liste à une dimention
 			data_size = [1, len(data)]
+			for col in range(1, data_size[1]+1):
+				self.ws[sheet].cell(from_line, col + from_cell).value = data[col-1]
 		else:
 			# Liste à deux dimentions
 			data_size = [len(data[0]), len(data)]
-
-
-		# On écrit les données en fonction des tailles définies 
-		raise SyntaxError("Programmation à compléter")
+			# On écrit les données en fonction des tailles définies 
+			for line in range(1, data_size[0]+1):
+				for col in range(1, data_size[1]+1):
+					self.ws[sheet].cell(line + from_line, col + from_cell).value = data[line-1][col-1]
 
 
 	def append(self, data, sheet=0):
@@ -108,8 +112,7 @@ class excel_file():
 			Data doit obligatoirement être un tuple ou une liste même s'il n'y a qu'un seul élément
 		"""
 		# Si on accède à la feuille par son indice, on récupère son nom
-		if type(sheet) == int:
-			sheet = tuple(self.ws)[0]
+		sheet = self.find_sheet(sheet)
 
 		if type(data) not in (list, tuple):
 			raise TypeError("Les données doivent être une liste ou un tuple à une ou deux dimentions")
@@ -127,8 +130,7 @@ class excel_file():
 			Par défaut pour les 100 premières colonnes et 100 premières lignes
 		"""
 		# Si on accède à la feuille par son indice, on récupère son nom
-		if type(sheet) == int:
-			sheet = tuple(self.ws)[0]
+		sheet = self.find_sheet(sheet)
 
 		
 
@@ -145,11 +147,20 @@ class excel_file():
 		""" Colorer une ligne """
 		
 		# Si on accède à la feuille par son indice, on récupère son nom
-		if type(sheet) == int:
-			sheet = tuple(self.ws)[0]
+		sheet = self.find_sheet(sheet)
 
 		for rows in self.ws[sheet].iter_cols(min_row=row_number, max_row=row_number, min_col=None, max_col=None):
 			for cell in rows:
+				cell.fill = PatternFill(start_color=color, end_color=color, fill_type = fill_type)
+
+	def color_column(self, col_number, color, fill_type = "solid", sheet=0, min_row=1, max_row=1000):
+		""" Colorer une colonne """
+		
+		# Si on accède à la feuille par son indice, on récupère son nom
+		sheet = self.find_sheet(sheet)
+
+		for col in self.ws[sheet].iter_cols(min_row=1, max_row=1000, min_col=col_number, max_col=col_number):
+			for cell in col:
 				cell.fill = PatternFill(start_color=color, end_color=color, fill_type = fill_type)
 
 
@@ -160,7 +171,7 @@ class excel_file():
 
 		# Si on accède à la feuille par son indice, on récupère son nom
 		if type(sheet) == int:
-			sheet_name = tuple(self.ws)[0]
+			sheet_name = tuple(self.ws)[sheet]
 		elif type(sheet) == str:
 			sheet_name = sheet
 		else:
