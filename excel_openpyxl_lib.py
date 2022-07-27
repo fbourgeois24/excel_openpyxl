@@ -132,8 +132,6 @@ class excel_file():
 		# Si on accède à la feuille par son indice, on récupère son nom
 		sheet = self.find_sheet(sheet)
 
-		
-
 		for column in range(column_start, column_end + 1):
 			max_width = 10
 			for row in range(row_start, row_end + 1):
@@ -159,7 +157,7 @@ class excel_file():
 		# Si on accède à la feuille par son indice, on récupère son nom
 		sheet = self.find_sheet(sheet)
 
-		for col in self.ws[sheet].iter_cols(min_row=1, max_row=1000, min_col=col_number, max_col=col_number):
+		for col in self.ws[sheet].iter_cols(min_row=1, max_row=max_row, min_col=col_number, max_col=col_number):
 			for cell in col:
 				cell.fill = PatternFill(start_color=color, end_color=color, fill_type = fill_type)
 
