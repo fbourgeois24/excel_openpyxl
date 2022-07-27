@@ -6,6 +6,7 @@ from openpyxl import styles as excel_style
 from openpyxl.utils import get_column_letter
 from openpyxl.styles import PatternFill
 from openpyxl.styles.colors import Color
+from openpyxl.styles.borders import Border, Side
 # import logging as log
 
 class excel_file():
@@ -176,4 +177,23 @@ class excel_file():
 			raise ValueError("sheet doit être une string ou un entier")
 
 		return sheet_name
+
+
+	def border(self, range, sheet=0):
+		""" Ajouter des bordures aux cellules
+		"""
+
+		sheet = self.find_sheet(sheet)
+		cell_range = self.ws[self.find_sheet(sheet)][range]
+		thin_border = Border(left=Side(style='thin'), 
+                     right=Side(style='thin'), 
+                     top=Side(style='thin'), 
+                     bottom=Side(style='thin'))
+
+		for line in cell_range:
+			for cell in line:
+				cell.border = thin_border
+
+
+
 
