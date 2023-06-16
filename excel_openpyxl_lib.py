@@ -103,8 +103,8 @@ class excel_file():
 			# Liste à deux dimentions
 			data_size = [len(data[0]), len(data)]
 			# On écrit les données en fonction des tailles définies 
-			for line in range(1, data_size[0]+1):
-				for col in range(1, data_size[1]+1):
+			for line in range(1, data_size[1]+1):
+				for col in range(1, data_size[0]+1):
 					self.ws[sheet].cell(line + from_line, col + from_cell).value = data[line-1][col-1]
 
 
