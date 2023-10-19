@@ -19,6 +19,7 @@ class excel_file():
 		self.filepath = filepath
 		self.next_line = next_line
 		self.data_only = data_only
+		self.save = False # Sauver à la fermeture
 
 
 	def create_workbook(self, sheet_name=None):
@@ -34,14 +35,21 @@ class excel_file():
 		self.ws[sheet_name] = self.wb.create_sheet(sheet_name)
 
 	def open(self, data_only=False):
-		self.wb = load_workbook(self.filepath, data_only=max(data_only, self.data_only))
+		""" Ouverture du document """
+		# On défini le data_only
+		self.data_only=max(data_only, self.data_only)
+		self.wb = load_workbook(self.filepath, data_only=self.data_only)
 		self.ws = {}
 		for sheet in self.wb.sheetnames:
 			self.ws[sheet] = self.wb[sheet]
 
-	def close(self, save=True):
-		if save:
-			self.wb.save(self.filepath)
+	def save(self):
+		""" Sauver le document """
+		self.wb.save(self.filepath)
+
+	def close(self, save=False):
+		if max(save, self.save):
+			self.save()
 		self.wb.close()
 
 	def __enter__(self):
@@ -49,8 +57,10 @@ class excel_file():
 		self.open()
 
 	def __exit__(self, *args, **kwargs):
-		# Fermeture après WITH
-		self.close()
+		""" Fermeture après WITH 
+			Pas de sauvergarde de la feuille si utilisation avec data_only
+		"""
+		self.close(save=self.save)
 
 	def read(self, range, sheet=0):
 		""" Lire une valeur dans le classeur """
@@ -64,6 +74,7 @@ class excel_file():
 			for line in cell_range:
 				line_values = []
 				for cell in line:
+					print(cell.value)
 					line_values.append(cell.value)
 				cell_values.append(line_values)
 			return cell_values
@@ -79,6 +90,9 @@ class excel_file():
 				- si line est à first_free, on cherche la première ligne libre
 				- si line est à next_free, on cherche la ligne libre suivante après self.next_line
 		"""
+		# On active la sauvegarde à la fermeture
+		self.save = True
+
 		# Si on accède à la feuille par son indice, on récupère son nom
 		sheet = self.find_sheet(sheet)
 
