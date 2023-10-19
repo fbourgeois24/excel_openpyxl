@@ -11,13 +11,14 @@ from openpyxl.styles.borders import Border, Side
 
 class excel_file():
 
-	def __init__(self, filepath, next_line=1):
+	def __init__(self, filepath, next_line=1, data_only=False):
 		"""
 			filepath est le chemin complet du fichier
 			next_line est la ligne suivante à laquelle écrire, par défaut, la première
 		"""
 		self.filepath = filepath
 		self.next_line = next_line
+		self.data_only = data_only
 
 
 	def create_workbook(self, sheet_name=None):
@@ -33,7 +34,7 @@ class excel_file():
 		self.ws[sheet_name] = self.wb.create_sheet(sheet_name)
 
 	def open(self, data_only=False):
-		self.wb = load_workbook(self.filepath, data_only=data_only)
+		self.wb = load_workbook(self.filepath, data_only=max(data_only, self.data_only))
 		self.ws = {}
 		for sheet in self.wb.sheetnames:
 			self.ws[sheet] = self.wb[sheet]
@@ -42,6 +43,14 @@ class excel_file():
 		if save:
 			self.wb.save(self.filepath)
 		self.wb.close()
+
+	def __enter__(self):
+		# Ouverture avec WITH
+		self.open()
+
+	def __exit__(self, *args, **kwargs):
+		# Fermeture après WITH
+		self.close()
 
 	def read(self, range, sheet=0):
 		""" Lire une valeur dans le classeur """
@@ -193,6 +202,9 @@ class excel_file():
 		for line in cell_range:
 			for cell in line:
 				cell.border = thin_border
+
+
+
 
 
 
