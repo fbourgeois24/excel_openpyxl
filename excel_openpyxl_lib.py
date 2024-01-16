@@ -19,7 +19,7 @@ class excel_file():
 		self.filepath = filepath
 		self.next_line = next_line
 		self.data_only = data_only
-		self.save = False # Sauver à la fermeture
+		self.save_on_exit = False # Sauver à la fermeture
 
 
 	def create_workbook(self, sheet_name=None):
@@ -48,7 +48,7 @@ class excel_file():
 		self.wb.save(self.filepath)
 
 	def close(self, save=False):
-		if max(save, self.save):
+		if max(save, self.save_on_exit):
 			self.save()
 		self.wb.close()
 
@@ -60,7 +60,7 @@ class excel_file():
 		""" Fermeture après WITH 
 			Pas de sauvergarde de la feuille si utilisation avec data_only
 		"""
-		self.close(save=self.save)
+		self.close(save=self.save_on_exit)
 
 	def read(self, range, sheet=0):
 		""" Lire une valeur dans le classeur """
@@ -91,7 +91,7 @@ class excel_file():
 				- si line est à next_free, on cherche la ligne libre suivante après self.next_line
 		"""
 		# On active la sauvegarde à la fermeture
-		self.save = True
+		self.save_on_exit = True
 
 		# Si on accède à la feuille par son indice, on récupère son nom
 		sheet = self.find_sheet(sheet)
